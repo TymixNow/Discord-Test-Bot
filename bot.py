@@ -1,15 +1,8 @@
 # This example requires the 'message_content' intent.
 
 from command import LeafCommander
-from replacer import Replacer
+from botdata import *
 import os
-
-uwuifier = Replacer({"l": "w", "r": "w", "uwu": "UwU", "owo": "OwO", ":)": ":3", ":D": ":3c", "=)": ">:3", "=D": ">:3c", "xd": "X3"})
-
-game = LeafCommander({"!errorTest":(lambda word: 0/0)}, default=(lambda word: uwuifier(word)))
-
-interaction = LeafCommander({"$": game})
-
 
 import discord
 
