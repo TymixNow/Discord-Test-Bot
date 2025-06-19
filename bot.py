@@ -22,10 +22,10 @@ async def on_message(message):
 
         m = Messager(client,message.channel)
         form = MessageForm("", message.channel.id)
-        text = none(call(message.content, form),"")
-        if text != "": await m(text)
+        call(message.content, form)
+        if form.text != "": await m(form)
     except Exception as e:
-        await message.channel.send(e.__str__())
+        await message.channel.send(typifier(uwuifier(e.__str__())))
 
 
 client.run(os.environ["DISCORD_API_KEY"])

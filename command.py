@@ -1,38 +1,38 @@
 from collections.abc import Callable
 from message_builder import MessageForm
-
 noop = lambda *args: None
 same = lambda x : x
 
 class Commander:
-    def __init__(self):
+    def __init__(self, **c):
+        self.commands = c
         pass
     def __call__(self, command : str, message : MessageForm):
-        pass
+        return command
 class LeafCommander(Commander):
-    def __init__(self, d : dict[str,tuple[Callable, Callable, bool] | Callable] = {},/, *, default : Callable = (lambda word: "") , **c: tuple[Callable, Callable, bool]):
-        d.update(c)
-        self.commands = d
+    def __init__(self, action : tuple[Callable, Callable] | Callable = same):
+        self.action = action
+    def __call__(self, command: str, message : MessageForm):
+        if isinstance(self.action, tuple):
+            message.rewrite(self.action[0](message, command))
+            message.redirect(self.action[1](message, command))
+        else:
+            message.rewrite(self.action(message, command))
+        return message.text
+class StemCommander(Commander):
+    def __init__(self,d : dict[str, tuple[Commander,Callable, Callable, bool] | Commander] = {}, / , * , default : Commander = LeafCommander(lambda word, x:""), **c: tuple[Commander, Callable, Callable, bool] | Commander):
+        super().__init__(**d,**c)
         self.default = default
     def __call__(self, command: str, message : MessageForm):
+        has = False
         for key in self.commands.keys():
             if command.startswith(key):
-                value_base : Callable | tuple = self.commands[key]
-                value : tuple = value_base if not callable(value_base) else tuple([value_base, noop, False])
-                message.rewrite(value[0].__call__(command.removeprefix(key)))
-                if value[2]: message.redirect(value[1].__call__(command.removeprefix(key)))
-                return 
-        message.rewrite(self.default.__call__(command))
-        return
-class StemCommander(Commander):
-    def __init__(self,d : dict[str, tuple[Commander,Callable, Callable, bool] | Commander] = {}, **c: tuple[Commander, Callable, Callable, bool] | Commander):
-        self.commands = c
-        self.commands.update(d)
-    def __call__(self, command: str, message : MessageForm):
-        for key in self.commands.keys():
-            if command.startswith(key):
+                has = True
                 value_base = self.commands[key]
-                value : tuple = value_base if not callable(value_base) else tuple([value_base, same, noop, False])
-                message.rewrite(value[1].__call__(value[0](command.removeprefix(key), message)))
+                value : tuple = value_base if not isinstance(value_base, Commander) else tuple([value_base, same, noop, False])
+                output = value[1].__call__(value[0](command.removeprefix(key), message))
+                message.rewrite(output)
                 if value[3]: message.redirect(value[2].__call__(command.removeprefix(key)))
-                return 
+        if not has:
+            message.rewrite(self.default(command, message))
+        return message.text

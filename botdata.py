@@ -1,7 +1,9 @@
 from replacer import Replacer
 from command import LeafCommander, StemCommander
 from jayson import Jayson
+from message_builder import MessageForm
 from sugar import str_none, none
+import random
 typifier = Replacer({"the":"de",
            "be":"b",
            "to":"2",
@@ -69,15 +71,39 @@ def saver(words : str):
     jay({key: value})
     return "saved " + value
 
-interaction = LeafCommander(
+def channel_extractor(command : str):
+    return int(command.removeprefix(" ").removeprefix("<#").removesuffix(" ").removesuffix(">"))
+
+def set_jay(jayson : Jayson, prompt : str, suf : str, key, val):
+    jayson({key: val})
+    return prompt + str(val) + suf
+
+channel_editor = StemCommander(
     {
+        "set ": LeafCommander(lambda edit, msg: set_jay(jay, "set channel to: <#", ">", "channel", channel_extractor(msg))),
+        "get ": LeafCommander(lambda edit, msg: jay["channel"])
+    }
+)
+
+meta = StemCommander(
+    {
+        "channel ": channel_editor
+    }
+)
+
+interaction = StemCommander(
+    {
+        "meta ": meta,
         "!errorTest":
-            (lambda word: 0/0),
-        "save ": saver,
-        "read ": (lambda word: typifier(uwuifier(str_none(jay[word], "", "wat " + word))))
+            LeafCommander(lambda x, word: 0/0),
+        "save ": LeafCommander(lambda x, y: saver(y)),
+        "read ": LeafCommander(lambda x, word: typifier(uwuifier(str_none(jay[word], "", "wat " + word)))),
+        "greet": 
+        LeafCommander(((lambda x,y: "Hewwo!"), lambda x,y: channel_extractor(y))),
+        "roll ": LeafCommander(lambda x, number: str(random.randint(1, int(number))))
     },
     default=
-        (lambda word: typifier(uwuifier(word.lower()) or ""))
+        LeafCommander(lambda x, word: typifier(uwuifier(word.lower()) or ""))
 )
 
 call = StemCommander({"$": interaction})

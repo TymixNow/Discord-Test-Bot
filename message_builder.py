@@ -16,7 +16,5 @@ class Messager:
         self.back = source
         self.client = client
     async def __call__(self, message : MessageForm):
-        try:
-            await self.client.get_partial_messageable(message.id).send(message.text)
-        except discord.HTTPException | discord.Forbidden | discord.NotFound as e:
-            await self.back.send(e.__str__())
+        channel = self.client.get_channel(message.id)
+        await getattr(channel, "send")(message.text)
