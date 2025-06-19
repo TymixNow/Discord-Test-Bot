@@ -1,6 +1,6 @@
 from typing import Any
 import json
-
+from sugar import *
 # Load memory
 class Jayson:
     def __init__(self):
@@ -20,4 +20,4 @@ class Jayson:
         self.save()
 
     def __getitem__(self, index : str):
-        return self.memory[index]
+        return self.memory[index] if index in self.memory.keys() else ""

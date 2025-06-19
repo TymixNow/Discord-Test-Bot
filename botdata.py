@@ -1,6 +1,7 @@
 from replacer import Replacer
-from command import LeafCommander
+from command import LeafCommander, StemCommander
 from jayson import Jayson
+from sugar import str_none, none
 typifier = Replacer({"the":"de",
            "be":"b",
            "to":"2",
@@ -68,17 +69,16 @@ def saver(words : str):
     jay({key: value})
     return "saved " + value
 
-
 interaction = LeafCommander(
     {
         "!errorTest":
             (lambda word: 0/0),
         "save ": saver,
-        "read ": (lambda word: jay[word])
+        "read ": (lambda word: typifier(uwuifier(str_none(jay[word], "", "wat " + word))))
     },
     default=
         (lambda word: typifier(uwuifier(word.lower()) or ""))
 )
 
-call = LeafCommander({"$": interaction})
+call = StemCommander({"$": interaction})
 

@@ -1,4 +1,5 @@
 from botdata import *
+from message_builder import MessageForm, Messager
 from sugar import *
 import os
 
@@ -19,10 +20,12 @@ async def on_message(message):
         if message.author == client.user:
             return
 
-        text = none(call(message.content),"")
-        if text != "": await message.channel.send(text)
+        m = Messager(client,message.channel)
+        form = MessageForm("", message.channel.id)
+        text = none(call(message.content, form),"")
+        if text != "": await m(text)
     except Exception as e:
-        await message.channel.send(e)
+        await message.channel.send(e.__str__())
 
 
 client.run(os.environ["DISCORD_API_KEY"])
