@@ -1,5 +1,6 @@
 from replacer import Replacer
 from command import LeafCommander
+from jayson import Jayson
 typifier = Replacer({"the":"de",
            "be":"b",
            "to":"2",
@@ -59,9 +60,25 @@ uwuifier = Replacer(
         }
     )
 
+jay = Jayson()
+
+def saver(words : str):
+    key = words.split()[0]
+    value = words.removeprefix(key).removeprefix(" ")
+    jay({key: value})
+    return "saved " + value
 
 
-game = LeafCommander({"!errorTest":(lambda word: 0/0)}, default=(lambda word: typifier(uwuifier(word.lower()) or "")))
+interaction = LeafCommander(
+    {
+        "!errorTest":
+            (lambda word: 0/0),
+        "save ": saver,
+        "read ": (lambda word: jay[word])
+    },
+    default=
+        (lambda word: typifier(uwuifier(word.lower()) or ""))
+)
 
-interaction = LeafCommander({"$": game})
+call = LeafCommander({"$": interaction})
 

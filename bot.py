@@ -1,7 +1,5 @@
-# This example requires the 'message_content' intent.
-
-from command import LeafCommander
 from botdata import *
+from sugar import *
 import os
 
 import discord
@@ -21,9 +19,7 @@ async def on_message(message):
         if message.author == client.user:
             return
 
-        text_cond = interaction(message.content)
-        text : str = ""
-        if text_cond is not None: text = text_cond
+        text = none(call(message.content),"")
         if text != "": await message.channel.send(text)
     except Exception as e:
         await message.channel.send(e)
