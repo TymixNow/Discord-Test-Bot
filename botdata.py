@@ -3,6 +3,7 @@ from command import LeafCommander, StemCommander
 from jayson import Jayson
 from message_builder import MessageForm
 from sugar import str_none, none
+from splash import Splash
 import random
 typifier = Replacer({"the":"de",
            "be":"b",
@@ -108,3 +109,17 @@ interaction = StemCommander(
 
 call = StemCommander({"$": interaction})
 
+prolly_uwu = (lambda x : (uwuifier(x) if random.randint(0,1) == 1 else x))
+
+greeter = Splash(
+    [
+        "a wild %s appeared",
+        "hello %s",
+        "ayooooo %s",
+        "%s come here, imma squeesh u",
+        "%s now exists",
+        "finally, some %s"
+    ]
+)
+
+squeesher = Splash(["%s","%s the squeesh","%s UwU"])

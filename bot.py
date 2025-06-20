@@ -7,12 +7,25 @@ import discord
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.presences = True
+intents.members = True
+intents.voice_states = True
 
 client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
+    jaychan = jay["channel"]
+    chan_id : int = jaychan if isinstance(jaychan, int) else 0
+    await client.get_partial_messageable(chan_id).send(prolly_uwu(greeter(squeesher("squeeshbot"))))
+
+@client.event
+async def on_presence_update(before : discord.Member, after : discord.Member):
+    if before.status != discord.Status.online and after.status == discord.Status.online:
+        jaychan = jay["channel"]
+        chan_id : int = jaychan if isinstance(jaychan, int) else 0
+        await client.get_partial_messageable(chan_id).send(prolly_uwu(greeter(squeesher(str_none(after.nick,"", after.name)))))
 
 @client.event
 async def on_message(message):
